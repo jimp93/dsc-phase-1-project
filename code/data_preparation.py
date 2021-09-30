@@ -7,14 +7,14 @@ import random
 import pandas as pd
 import requests
 import json
-from pprint import pprint
 import numpy as np
 from wordcloud import WordCloud
-from pandasql import sqldf
-pysqldf = lambda q: sqldf(q, globals())
 import matplotlib.pyplot as plt
 import seaborn as sns
-%matplotlib inline
+
+# global list needed for df constructing
+
+base_fin_col_list = ['imdb_code', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$', 'profit_loss_$', 'return_pct', 'domestic_%', 'Genre_List']
 
 """
 INITIATION FUNCTIONS
@@ -35,30 +35,29 @@ def get_api_keys():
 
 ## This function opens up the stored dataframes, to save having to scrape all the movies every time
 def open_files():
-    all_financials_df = pd.read_csv('../data/all_financials_df.csv')
-    attributes_df = pd.read_csv('../data/attributes_df.csv', converters={'Genre_List': eval, 'Actor_List': eval, 'Writer_List': eval, 'Director_List': eval})
-
-    financial_attributes_join = pd.read_csv('../data/financial_attributes_join.csv', converters={'Genre_List': eval, 'Actor_List': eval, 'Writer_List': eval, 'Director_List': eval})
-    financial_attributes_hits_join = pd.read_csv('../data/financial_attributes_hits_join.csv', converters={'Genre_List': eval, 'Actor_List': eval, 'Writer_List': eval, 'Director_List': eval})
-
-    with open('../data/omdb_attrs.json') as oma:
-        omdb_attrs = json.load(oma)
-
-    with open("../data/financials_list.json", "r") as fp:
-         financials_list = json.load(fp)
+    numbers_df = pd.read_csv('data/numbers_df.csv')
+    attributes_df = pd.read_csv('data/attributes_df.csv', converters={'Genre_List': eval, 'Actor_List': eval, 'Writer_List': eval, 'Director_List': eval})
+    financials_15_df = pd.read_csv('data/financials_15_df.csv')
+    
+    with open("data/financials_list.json", "r") as fp:
+        financials_list = json.load(fp)
+        
+    with open("data/omdb_attrs.json", "r") as ffo:
+        omdb_attrs = json.load(ffo)
      
-    return(all_financials_df, attributes_df)
+    return (financials_list, numbers_df, financials_15_df, omdb_attrs, attributes_df)
 
-## Saves raw dataframes at the end of the session
-def save_files():
+## Saves raw dataframes at the end of session where they were created
+def save_files(financials_list, numbers_df, financials_15_df, omdb_attrs, attributes_df):
     numbers_df.to_csv('data/numbers_df.csv', index=False)
-    all_financials_df.to_csv('data/all_financials_df.csv', index=False)
+    financials_15_df.to_csv('data/financials_15_df.csv', index=False)
     attributes_df.to_csv('data/attributes_df.csv', index=False)
-    with open("financials_list.json", "w") as ffp:
+    
+    with open("data/financials_list.json", "w") as ffp:
         json.dump(financials_list, ffp)
-    with open('pair_profit_dict.json', 'w+') as ppd:
-        json.dump(pair_profit_dict, ppd)
 
+    with open("data/omdb_attrs.json", "w") as ffo:
+        json.dump(omdb_attrs, ffo)
      
 """ SCRAPING/DATAFRAME CONSTRUCTION/CLEANING FUNCTIONS """
 
@@ -87,9 +86,8 @@ def the_numbers_scraping():
                 financials_list.append(row_list)
     return financials_list
 
-def construct__prepare_numbers_df():
-    financials_list = the_numbers_scraping()
-    
+
+def construct_prepare_numbers_df(financials_list):  
     numbers_df = pd.DataFrame(financials_list)
     numbers_df.columns=['release_date', 'title', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$']
 
@@ -115,34 +113,41 @@ def construct__prepare_numbers_df():
             
     numbers_df = numbers_df[['title', 'release_year', 'release_month', 'release_day', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$']]
     
+    # dummy date to allow int coversion
+    for index, row in numbers_df.iterrows():
+        if row['release_year'] == '':
+            row['release_year'] = '0'
+        
     # make columns numeric
-    numbers_df[['release_year', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$']] = all_financials_df[['release_year', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$']].astype('int64')
+    numbers_df[['release_year', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$']] = numbers_df[['release_year', 'budget_$', 'domestic_box_office_$', 'worldwide_box_office_$']].astype('int64')
     
     #filter out any movies with less than $1m budget
     numbers_df = numbers_df[numbers_df['budget_$'] >1000000]
-
-    # make imdb_code column that will be primary key and used to join to the attributes df later
-    numbers_df.insert(0, "imdb_code", "No_code")
     
     # filter out any films where worldwide figures suggest unusable film, and where domestic 
     # takings suggest it was only a hit outside the US
     
     numbers_df = numbers_df[numbers_df['domestic_box_office_$'] > 0]
     numbers_df = numbers_df[numbers_df['worldwide_box_office_$'] > 0]
-    
-    #make profit/loss columns - gross and return on investment and column of domestic share of takings
-    numbers_df['profit_loss_$'] = numbers_df['worldwide_box_office_$'] - numbers_df['budget_$']
-    numbers_df['return_pct'] = (100 / numbers_df['budget_$']) * numbers_df['profit_loss_$']
-    numbers_df['domestic_%'] = 100 * (numbers_df['domestic_box_office_$'] / numbers_df['worldwide_box_office_$'])
-    
-    # filter for only last 15 years
-    numbers_df = numbers_df[numbers_df['release_year'] >= 2007]
-    
-    
-    
+        
     return numbers_df
 
-
+def make_fin_15(numbers_df):
+    financials_15_df = numbers_df.copy()
+    
+    # make imdb_code column that will be primary key and used to join to the attributes df later
+    financials_15_df.insert(0, "imdb_code", "No_code")
+       
+    # make profit/loss columns - gross and return on investment and column of domestic share of takings
+    financials_15_df['profit_loss_$'] = financials_15_df['worldwide_box_office_$'] - financials_15_df['budget_$']
+    financials_15_df['return_pct'] = (100 / financials_15_df['budget_$']) * financials_15_df['profit_loss_$']
+    financials_15_df['domestic_%'] = 100 * (financials_15_df['domestic_box_office_$'] / financials_15_df['worldwide_box_office_$'])
+    
+    # filter for only last 15 years
+    financials_15_df = financials_15_df[financials_15_df['release_year'] >= 2007]
+    
+    return financials_15_df
+    
 
 ### These functions will be called by the next bloc of code, they will manually update the attributes dictionary obtained from 
 # the omdb api for films where the imdb code could ot be found programatically, mainly due to ambiguous titles or 
@@ -176,7 +181,7 @@ manual_imdb = ['tt2488496', 'tt2527336', 'tt0473075', 'tt1905041', 'tt0980970', 
 zipped_codes = list(zip(manual_list, manual_imdb))
 
 
-def update_on_success(movie_data, pair, imdb_code):
+def update_on_success(financials_15_df, movie_data, pair, imdb_code):
     title = pair[0]
     financials_15_df.loc[financials_15_df['title'] == title, 'imdb_code'] = imdb_code
     keys = ['Actors', 'Director', 'Genre', 'Plot', 'Rated', 'Ratings', 'Runtime', 'Writer', 'Title', 'imdbRating', 'imdbVotes']
@@ -187,16 +192,19 @@ def update_get_page(url):
     movie_data = json.loads(response.content.decode('utf-8')) 
     return movie_data
 
-def update_make_omdb_dict(zipped_codes):
+def update_make_omdb_dict(financials_15_df, omdb_key):
     for pair in zipped_codes:
         imdb_code = pair[1]
         url = 'http://www.omdbapi.com/?i=' + imdb_code + '&apikey=' + omdb_key
         try:
             movie_data = update_get_page(url)
-            update_on_success(movie_data, pair, imdb_code) 
+            update_on_success(financials_15_df, movie_data, pair, imdb_code) 
         except:
             update_dud_url.append(pair[0])
-        
+     # delete any rows in financials_15yr where there is no imdb_code
+
+    financials_15_df = financials_15_df[financials_15_df.imdb_code != 'No_code']
+    return financials_15_df
 
 # this goes through each of the films in numbers_df and retrieves its data from
 # omdb. has similar data to imdb with high call limit
@@ -211,16 +219,13 @@ omdb_attrs = {}
 dud_url=[]
 retrieve_error=[]
 
-
-def 
-
-def on_success(movie_data, movie):
-    imdb_id = movie_data['imdbID']  
+def on_success(financials_15_df, movie_data, movie):
+    imdb_id = movie_data['imdbID'] 
     financials_15_df['imdb_code'][financials_15_df.title == movie] = imdb_id
     keys = ['Actors', 'Director', 'Genre', 'Plot', 'Rated', 'Ratings', 'Runtime', 'Writer', 'Title', 'imdbRating', 'imdbVotes']
     omdb_attrs[imdb_id] = {x:movie_data[x] for x in keys}
 
-def url_maker(year, title):
+def url_maker(year, title, omdb_key):
     url = 'http://www.omdbapi.com/?t=' + title + '&y=' + year + '&apikey=' + omdb_key
     return url
 
@@ -230,38 +235,30 @@ def get_page(url):
     movie_data = json.loads(response.content.decode('utf-8')) 
     return movie_data
 
-def make_omdb_dict(numbers_df):
-    financials_15_df = numbers_df.copy()
+def make_omdb_dict(financials_15_df, omdb_key):
     for index, row in financials_15_df.iterrows():
         movie = row['title']
         title = movie.replace(',', '%2C').replace (' ', '+').replace (':', '%3A')
         year = str(row['release_year'])
-        url = url_maker(year, title)
+        url = url_maker(year, title, omdb_key)
         try:
             movie_data = get_page(url)
             if "Error" in movie_data:  
                 prev_year = (str(int(year) -1))
-                url = url_maker(prev_year, title)
+                url = url_maker(prev_year, title, omdb_key)
                 movie_data = get_page(url)  
                 #used during dev to check for non returning films
                 if "Error" in movie_data:
                     film_error = movie + " - " + movie_data_t['Error'] + "\n"
                     retrieve_error.append(prev_film_error)
                 else:
-                    on_success(movie_data, movie)
+                    on_success(financials_15_df, movie_data, movie)
             else:
-                on_success(movie_data, movie)  
+                on_success(financials_15_df, movie_data, movie)  
         except:
             dud_url.append(movie)
-    
-    # call function to update attributes dctionary with the manual imdb codes, obtained using process describd below
-    # end result is that the global attributes dictionary is fully updated and imdb_code filled in for financials_15_df
-    update_make_omdb_dict(zipped_codes)
-    
-    # delete any rows in financials_15yr where there is no imdb_code
 
-    financials_15_df = financials_15_df[financials_15_df.imdb_code != 'No_code']
-    return financials_15_df
+    return (omdb_attrs, financials_15_df)
          
             
             
@@ -344,11 +341,12 @@ def make_attributes_df():
     for m in omdb_attrs:
         to_df_dict[m] = {}
         
-    for ks in att_keys:
-        try:
-            to_df_dict[m][ks] = omdb_attrs[m][ks]
-        except:
-            to_df_dict[m][ks] = 'NaN'
+        for ks in att_keys:
+            try:
+                to_df_dict[m][ks] = omdb_attrs[m][ks]
+            except:
+                to_df_dict[m][ks] = np.nan 
+
      
     #make the actual attributes_df
     
@@ -383,6 +381,10 @@ def make_joined_dfs(financials_15_df, financials_hits_df, financials_flops_df, a
     financial_attributes_join = financials_15_df.merge(attributes_df, how='left', on='imdb_code')
     financial_attributes_hits_join = financials_hits_df.merge(attributes_df, how='left', on='imdb_code')
     financial_attributes_flops_join = financials_flops_df.merge(attributes_df, how='left', on='imdb_code')
+    
+    financial_attributes_join.fillna({'Genre_List':'N/A', 'Actor_List':'N/A', 'Director_List': 'N/A', 'Writer_List': 'N/A', 'Rated': 'N/A'}, inplace=True)
+    financial_attributes_hits_join.fillna({'Genre_List':'N/A', 'Actor_List':'N/A', 'Director_List': 'N/A', 'Writer_List': 'N/A', 'Rated': 'N/A'}, inplace=True)
+    financial_attributes_flops_join.fillna({'Genre_List':'N/A', 'Actor_List':'N/A', 'Director_List': 'N/A', 'Writer_List': 'N/A', 'Rated': 'N/A'}, inplace=True)
     
     return(financial_attributes_join, financial_attributes_hits_join, financial_attributes_flops_join)
 
@@ -494,6 +496,7 @@ def budget_prep(thriller_all):
     thriller_all_s['budget_$'] = thriller_all_s['budget_$']/1000000
     thriller_all_s=thriller_all_s.sort_values(by='return_pct', ascending = False)
     thriller_all_s = thriller_all_s[1:]
+    return thriller_all_s
     
 
 # this bloc makes dataframe of movies containing the top 5 in each crew category, 
@@ -544,7 +547,7 @@ def rank_generator(top_full_crew_df, crew_column, top_crew_list):
     df['rating rank'] = range(1, 1+len(df))
     return df
 
-def omdb_genre_keywords(financial_attributes_hits_join):
+def omdb_genre_keywords(financial_attributes_hits_join, tmdb_key):
     all_profitable_in_genre_df = full_dataframe_maker(['title'], financial_attributes_hits_join, ['Horror', 'Thriller', 'Mystery'])
     imdb_list = all_profitable_in_genre_df['imdb_code'].tolist()
     all_data={}

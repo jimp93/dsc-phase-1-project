@@ -14,8 +14,7 @@ from pandasql import sqldf
 pysqldf = lambda q: sqldf(q, globals())
 import matplotlib.pyplot as plt
 import seaborn as sns
-%matplotlib inline
-
+import code.data_preparation as dprep
 
 # takes in dataframe and 2 columns to produce bar chart using their values
 def basic_sns_bar(x, y, title, x_lab, y_lab, file_name, rotation): 
@@ -36,9 +35,9 @@ def lineplotter(df, x_col, y_col, title, x_lab, y_lab, file, h=None):
     sns.set_context('poster')
     ax = sns.lineplot(data=df, x=x_col, y=y_col, hue=h)
     plt.title(title, y=1.05)
-    plt.xlabel(x_lab)
+    plt.xlabel(x_lab, fontsize=12)
     plt.xticks()
-    plt.ylabel(y_lab)
+    plt.ylabel(y_lab, fontsize=12)
     fig.tight_layout()
     plt.savefig(file, transparent = True);
     return ax
@@ -61,7 +60,7 @@ def rank_seaborn_bar(df, x_col, x_label, title, file_name, invert = False, f=12)
     plt.ylabel('Rank')
     fig.tight_layout()
     plt.savefig(file_name, transparent = True)
-    return ax;
+    return ax
 
 # makes a grouped bar chart showing number of hits and flops for each genre
 def grouped_bar_genre(filtered_concat_gen_df):
@@ -82,12 +81,12 @@ def grouped_bar_genre(filtered_concat_gen_df):
     ax.set_yticks(x)
     ax.set_yticklabels(labels, fontsize=17)
     ax.legend()
-    plt.savefig(f'flops_v_hits.png', transparent = True)
+    plt.savefig(f'images/flops_v_hits.png', transparent = True)
     fig.tight_layout()
     plt.show()
     
 # Make box plot to show the variance in gross profit and loss by genre
-def profit_box_plot():
+def profit_box_plot(financial_attributes_join):
     genre_count = financial_attributes_join.explode('Genre_List')
     both_dic ={}
     for index, row in genre_count.iterrows():
@@ -107,7 +106,7 @@ def profit_box_plot():
     plt.xlabel('Genre', fontsize=17)
     plt.ylabel('Profit/Loss $m', fontsize=17)
     plt.title('Profit/Loss spread using every film in each genre', y = 1.03, fontsize=20)
-    plt.savefig(f'genre-pl-boxplot.png', transparent = True)
+    plt.savefig(f'images/genre-pl-boxplot.png', transparent = True)
     #fig.tight_layout()
     plt.show();
 
@@ -133,11 +132,10 @@ def p_l_gross_group_bar(financial_attributes_join):
     plt.xticks(rotation=90)
     plt.ylabel('profit/loss $m')
     plt.xlabel('genre')
-    plt.savefig('grouped_pl_gross.png', transparent = True)
+    plt.savefig('images/grouped_pl_gross.png', transparent = True)
     ax.set_yscale('symlog')
     plt.legend(loc='upper right')
     plt.show()
-df = p_l_gross_group_bar()
 
 # produces bar chart showing mean budget of movies in each genre
 def budget_profit_bar(genre_df):
@@ -149,14 +147,17 @@ def budget_profit_bar(genre_df):
     title = 'Mean budget per genre'
     y_lab = 'Budget $m'
     x_lab = 'Genre'
-    file_name = 'budget_genre.png'
+    file_name = 'images/budget_genre.png'
     basic_sns_bar(gen_list, bud_list, title, x_lab, y_lab, file_name, rotation=90)
 
 # produces lineplot showing returns per budget
 def budget_line(financial_attributes_join):
     df = financial_attributes_join.copy()
     for index, row in df.iterrows():
-        df.loc[index,'Thriller'] = 'T' if 'Thriller' in row['Genre_List'] else 'NT'
+        try:
+            df.loc[index,'Thriller'] = 'Thriller' if 'Thriller' in row['Genre_List'] else 'Not Thriller'
+        except:
+            df.loc[index,'Thriller'] = 'NT'
     df['return_%'] = df['return_pct']
     df['budget_$'] = df['budget_$']/1000000
     df=df.sort_values(by='return_%', ascending = False)
@@ -169,11 +170,11 @@ def budget_line(financial_attributes_join):
     plt.xticks(rotation=90)
     plt.ylabel('return %')
     plt.xlabel('budget $m')
-    plt.savefig('budget_pl_scatter.png', transparent = True)
+    plt.savefig('images/budget_pl_scatter.png', transparent = True)
     plt.legend(loc='upper right')
     plt.show()
 
-def budget_sub_scatter(thriller_all_s)
+def budget_sub_scatter(thriller_all_s):
     fig, ax = plt.subplots(figsize=(15, 7))
     sns.set_context('poster')
     sns.scatterplot(x='budget_$', y='return_pct', hue = 'subgenre', data=thriller_all_s)
@@ -181,19 +182,20 @@ def budget_sub_scatter(thriller_all_s)
     plt.xticks(rotation=90)
     plt.ylabel('return %')
     plt.xlabel('budget $m')
-    plt.savefig('budget_pl__sub_scatter.png', transparent = True)
+    plt.savefig('images/budget_pl_sub_scatter.png', transparent = True)
     plt.legend(loc='upper right')
     plt.show()
 
     
 # generates subplots showing relative performance of best peforming crew members in the genre
+
 def graph_generator(top_full_crew_df, crew_column, top_crew_list, crew_type):
     df= dprep.rank_generator(top_full_crew_df, crew_column, top_crew_list)
     df1 = df[[crew_column, 'return % rank', 'gross profit rank', 'rating rank']]
     df1 = pd.melt(df1, id_vars=[crew_column])
     
     fig, ax = plt.subplots(1, 2, figsize=(15, 8))
-    fig.suptitle('Bar charts of actors performance rankings and budgets', y=1.05)
+    fig.suptitle(f'Bar charts of {crew_type} performance rankings and budgets', y=1.05)
     
     sns.set_context('poster')
     sns.barplot(ax=ax[0], x=crew_column, y= 'value', hue='variable', data=df1)
@@ -206,11 +208,11 @@ def graph_generator(top_full_crew_df, crew_column, top_crew_list, crew_type):
     df_b = df.copy()
     df_b['budget_$'] = df_b['budget_$']/1000000
     sns.barplot(ax=ax[1], x=crew_column, y= 'budget_$', data=df_b)
-    ax[1].set_title(f'Average budget film budget: {crew_type}', y=1.03)
+    ax[1].set_title(f'Average film budget: {crew_type}', y=1.03)
     ax[1].tick_params(labelrotation=90)
     ax[1].set_ylabel('Budget $m')
     ax[1].set_xlabel(crew_type)
-    plt.savefig(f'{crew_type}_ranks.png', transparent = True)
+    plt.savefig(f'images/{crew_type}_ranks.png', transparent = True)
     plt.show()
 
 # makes bar plot of profit vx rating classification
@@ -225,7 +227,7 @@ def rated(ranked_df):
     basic_sns_bar(x, y, title, x_lab, y_lab, file_name, rotation);   
     
 # makes scatterplot showing any link between user ratings and profit
- def user_rating_v_profit(financial_attributes_join):
+def user_rating_v_profit(financial_attributes_join):
     df=financial_attributes_join.copy()
     df= df.sort_values(by='return_pct', ascending=False)
     df=df[3:]
@@ -236,7 +238,7 @@ def rated(ranked_df):
     ax = sns.regplot(x="mean_rating", y="return_pct", data=df, fit_reg=True)
     ax.set_xlabel('mean rating')
     ax.set_ylabel('return %')
-    plt.savefig(f'ratings_return.png', transparent = True);
+    plt.savefig('images/ratings_return.png', transparent = True);
 
 # makes linplot showing yearly takings trend, overall and by genre
 def overall_time_trend(financial_attributes_join):
@@ -253,12 +255,12 @@ def overall_time_trend(financial_attributes_join):
     df=df[['release_year', 'worldwide_box_office_$', 'genre_takings']]
     df=df[:15]
     df=df.melt(id_vars=['release_year'])
-    ax = lineplotter(df, 'release_year', 'value', 'wordwide takings by genre', 'year', 'total takings $b', 'word_genre_takings.png', h='variable')
+    ax = lineplotter(df, 'release_year', 'value', 'wordwide takings by genre', 'year', 'total takings $b', 'images/word_genre_takings.png', h='variable')
     ax.set_yscale('log')
     
 # makes ranked bar graph of most profitable films in the genre over last 15 years
 def best_genre_films(financial_attributes_join):   
-    top_20_df = full_dataframe_maker(['title'], financial_attributes_join, ['Horror', 'Thriller', 'Mystery'])
+    top_20_df = dprep.full_dataframe_maker(['title'], financial_attributes_join, ['Horror', 'Thriller', 'Mystery'])
     top_20_df = top_20_df.sort_values(by = 'return_pct', ascending = False)
     top_20_df['return_p_rank'] = range(1, 1+len(top_20_df))
     
@@ -269,15 +271,15 @@ def best_genre_films(financial_attributes_join):
     all_df = top_20_df.sort_values(by = 'combined_rank')
     
     top_20_df = top_20_df.sort_values(by = 'combined_rank')[:20]
-    ax=rank_seaborn_bar(top_20_df, 'title', 'movie title', "Most profitable movies in the genre by rank", 'all_time_rank.png', f=10);
+    ax=rank_seaborn_bar(top_20_df, 'title', 'movie title', "Most profitable movies in the genre by rank", 'images/all_time_rank.png', f=10);
 
 # makes a masked wordcloud of the keywords that appear most often attached to profitable movies in the genre
 def wordcloud(text):
     text = " ".join(text)
-    mask = np.array(Image.open("../images/zombie.png"))
+    mask = np.array(Image.open("images/zombie.png"))
     wordcloud = WordCloud(background_color="white", width=800, height=400, mask=mask, contour_width=3, min_font_size=10, contour_color='steelblue')
     wordcloud.generate(text)
-    wordcloud.to_file("../ghost.png")
+    wordcloud.to_file("images/wczombie.png")
     fig, ax = plt.subplots(figsize=(25, 20))
     plt.imshow(wordcloud, interpolation='bilinear')
     plt.axis("off")
