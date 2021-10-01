@@ -1,65 +1,98 @@
-# Phase 1 Project
-
-You've made it all the way through the first phase of this course - take a minute to celebrate your awesomeness!
-
-![awesome](https://raw.githubusercontent.com/learn-co-curriculum/dsc-phase-1-project/master/awesome.gif)
-
-Now you will put your new skills to use with a large end-of-Phase project! This project should take 20 to 30 hours to complete.
-
 ## Project Overview
 
-For this project, you will use exploratory data analysis to generate insights for a business stakeholder.
+This project analyzes the last 15 years of box office takings to produce recommendations for Microsoft Studio on which type of movies it should produce, when it should release them and the features the movies should include.
+
+Descriptive analysis of movie attributes and financial performance shows that Thriller/Mystery/Horror films provide the best chance of success, with a runtime of around 100 minutes and budget of around $25 million.
+
+It also shows that the market is not yet recovering from the pandemic lockdowns
+
+Microsoft Studio can use this analysis to produce movies that have most chance of turning a healthy profit
+
+<img src="images/neon.jpg" style="width: 700px;"/>
 
 ### Business Problem
 
-Microsoft sees all the big companies creating original video content and they want to get in on the fun. They have decided to create a new movie studio, but they don’t know anything about creating movies. You are charged with exploring what types of films are currently doing the best at the box office. You must then translate those findings into actionable insights that the head of Microsoft's new movie studio can use to help decide what type of films to create.
+To turn a profit for stakeholders, making efficient use of a realistic budget for the studio's first movies. This relies on recruiting the right crew, with a track record of producing profitable and acclaimed movies, and including features most associated with successful movies
+
+ 
 
 ### The Data
 
-In the folder `zippedData` are movie datasets from:
+Data drawn from three sources:
 
-* [Box Office Mojo](https://www.boxofficemojo.com/)
-* [IMDB](https://www.imdb.com/)
-* [Rotten Tomatoes](https://www.rottentomatoes.com/)
-* [TheMovieDB](https://www.themoviedb.org/)
-* [The Numbers](https://www.the-numbers.com/)
+*  **Box office performance of more the 6,000 movies from The Numbers website**
+*  **Genre, crew, and release date of each movie from Open Movie Database (OMDB)**
+    This also contains average user ratings from Rotten Tomatoes, imdb and Metacritic**
+*  **Keywords attached to each movie from The Movie DB (TMDB)**
 
-It is up to you to decide what data from this to use and how to use it. If you want to make this more challenging, you can scrape websites or make API calls to get additional data. If you are feeling overwhelmed or behind (e.g. struggled with the Phase 1 Code Challenge), we recommend you use only the following data files:
+### Methods
 
-* imdb.title.basics
-* imdb.title.ratings
-* bom.movie_gross
+The worldwide box office takings for the last 15 years were analysed to give a general trend
 
-## Deliverables
+Each movie released in the last 15 years was ranked using a combination of gross box office profit and return on investment, giving a way of comparing the performance of movies with different budgets
 
-There are three deliverables for this project:
+The best ranked movies were then analysed to find the most profitable genres
 
-* A **GitHub repository**
-* A **Jupyter Notebook**
-* A **non-technical presentation**
+Within those genres, the movies were analysed to find which actors, directors and writers were most successful, the runtime and rating classifications most associated with hits and the budget likely to be needed
 
-Review the "Project Submission & Review" page in the "Milestones Instructions" topic for instructions on creating and submitting your deliverables. Refer to the rubric associated with this assignment for specifications describing high-quality deliverables.
 
-### Key Points
+<img src="images/reel.jpg" style="width: 700px;"/>
 
-* **Your analysis should yield three concrete business recommendations.** The ultimate purpose of exploratory analysis is not just to learn about the data, but to help an organization perform better. Explicitly relate your findings to business needs by recommending actions that you think the business (Microsoft) should take.
 
-* **Communicating about your work well is extremely important.** Your ability to provide value to an organization - or to land a job there - is directly reliant on your ability to communicate with them about what you have done and why it is valuable. Create a storyline your audience (the head of Microsoft's new movie studio) can follow by walking them through the steps of your process, highlighting the most important points and skipping over the rest.
+### R![director_rank]
+*  **Box office takings are still down sharply on pre-pandemic levels, with no recovery so far in 2021**
 
-* **Use plenty of visualizations.** Visualizations are invaluable for exploring your data and making your findings accessible to a non-technical audience. Spotlight visuals in your presentation, but only ones that relate directly to your recommendations. Simple visuals are usually best (e.g. bar charts and line graphs), and don't forget to format them well (e.g. labels, titles).
+<img src="images/wordlwide_bo.png" style="width: 700px;"/>
 
-## Getting Started
+*  **The Thriller genre produced the best box office performing movies with a realistic start-up budget ($20 -30 million)**
+*  **Action movies represent a riskier but potentially more profitable option once the studio is more established**
 
-Please start by reviewing this assignment, the rubric at the bottom of it, and the "Project Submission & Review" page. If you have any questions, please ask your instructor ASAP.
+<img src="images/genre_rank.png" style="width: 700px;"/>
 
-Next, we recommend you check out [the Phase 1 Project Templates and Examples repo](https://github.com/learn-co-curriculum/dsc-project-template) and use the MVP template for your project.
 
-Alternatively, you can fork [the Phase 1 Project Repository](https://github.com/learn-co-curriculum/dsc-phase-1-project), clone it locally, and work in the `student.ipynb` file. Make sure to also add and commit a PDF of your presentation to your repository with a file name of `presentation.pdf`.
 
-## Project Submission and Review
+<img src="images/budget_genre.png" style="width: 700px;"/>
 
-Review the "Project Submission & Review" page in the "Milestones Instructions" topic to learn how to submit your project and how it will be reviewed. Your project must pass review for you to progress to the next Phase.
 
-## Summary
+*  **Within that genre, the sub-genres of Horror and Mystery were most associated with hits**
 
-This project will give you a valuable opportunity to develop your data science skills using real-world data. The end-of-phase projects are a critical part of the program because they give you a chance to bring together all the skills you've learned, apply them to realistic projects for a business stakeholder, practice communication skills, and get feedback to help you improve. You've got this!
+<img src="images/subgenre_rank.png" style="width: 700px;"/>
+
+
+*  **Rose Byrne, Patrick Wilson have been the most profitable actors in the Thriller/Mystery/Horror genre**
+*  **Jordan Peele and James Wan have been the most profitable directors and writers in the genre**
+
+<img src="images/actors_ranks.png" style="width: 700px;"/>
+
+
+
+<img src="images/directors_ranks.png" style="width: 700px;"/>
+
+
+
+
+
+*  **The most successful films in the genre have a runtime of around 110 minutes**
+
+ 
+### Conclusion
+
+This analysis leads to three recommendations for Microsoft Studio to make a succesful movie
+
+*  **TIMING -** Wait until the market recovers before releasing movies, with July 2022 and February 2023 potential target dates
+
+*  **FEATURES -** Early movies should be in the Thriller genre, with Thriller/Horror/Mysteries offering the best chance of early success 
+ They should have a $20 - $30 million budget and a runtime of 94 to 100 minutes. The studio should think about action movies once it has etablished a reputation
+ 
+*  **PERSONNEL -** The studio should recruit Rose Byrne and Patrick Wilson in early movies, and Jordan Peele to write and direct
+
+
+### Next steps
+
+*  Collect as much information as possible from the top 10 global markets to see if they are recovering from the pandemic
+ 
+* Conduct surveys to see which tyopes of film people want to see after the pandemic
+
+*  Collect data on the view count of movies on streaming services compared with the cinema
+
+*  So far the value of a movie in the streaming market has generally been linked to its box office performance, data needs to be collected to track whether this trend is changing

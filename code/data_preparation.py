@@ -479,11 +479,11 @@ def make_profit_loss_df(financial_attributes_join, financial_attributes_flops_jo
 # These 2 functions prepare thriller data for scatterplot of return on budget by subgenre
 def genre_filter(row):
     if 'Horror' in row['Genre_List'] and 'Mystery' in row['Genre_List']:
-        value = 'Thriller/Horror/Mystery'
+        value = 'Thriller/Mystery/Horror'
     elif 'Horror' in row['Genre_List'] and 'Mystery' not in row['Genre_List']:
         value = 'Thriller/Horror'
     elif 'Horror' not in row['Genre_List'] and 'Mystery' in row['Genre_List']:
-        value = 'Mystery'
+        value = 'Thriller/Mystery'
     else:
         value = 'Thriller'
     return value
