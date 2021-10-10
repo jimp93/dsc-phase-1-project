@@ -61,7 +61,7 @@ def graph_generator(top_full_crew_df, crew_column, top_crew_list, crew_type, gen
     df1 = pd.melt(df1, id_vars=[crew_column])
     
     fig, ax = plt.subplots(1, 2, figsize=(15, 8))
-    fig.suptitle(f'Bar Charts of {crew_type} Performance Rankings and Budgets', y=1.05, fontsize=22)
+    fig.suptitle(f'Bar Charts of {crew_type} Overall Performance Rankings and Budgets', y=1.05, fontsize=22)
     
     sns.set_context('poster')
     sns.barplot(ax=ax[0], x=crew_column, y= 'value', hue='variable', data=df1)
