@@ -2,9 +2,12 @@
 
 This project analyzes the last 15 years of box office takings to produce recommendations for Microsoft Studio on which type of movies it should produce, when it should release them and the features the movies should include.
 
-Descriptive analysis of movie attributes and financial performance shows that Thriller films provide the best chance of success, particularly in the Mystery/Horror subgenres, with a runtime of around 100 minutes and budget of around $25 million.
+Descriptive analysis of movie attributes and financial performance shows that high budget Action/Adventure/Sci-Fi movies generate the biggest profits, with a runtime of over 137 minutes, a budget of betweeen $150 and $250 million and a relase month of April or December.
+Mark Ruffalo has been the most profitable actor in the genre, and Joss Whedon the most profitable director/writer.
+Lower budget Horror/Mystery/Thrillers gave the best return on investment, with a runtime of between 96 and 116 minutes, a budget of $20 to $25 million and a release month of July. 
+Patrick Wilson and Rose Byrne have been the best box office performing and user rated actors in the genre, with Jordan Peele the best performing writer/director.
 
-It also shows that the market is not yet recovering from the pandemic lockdowns
+It also shows that the market has barely begun to recover from the pandemic lockdowns
 
 Microsoft Studio can use this analysis to produce movies that have most chance of turning a healthy profit
 
@@ -21,7 +24,7 @@ To turn a profit for stakeholders, making efficient use of a realistic budget fo
 Data drawn from three sources:
 
 *  **Box office performance of more the 6,000 movies from The Numbers website**
-*  **Genre, crew, and release date of each movie from Open Movie Database (OMDB)**
+ *  **Genre, crew, and release date of each movie from Open Movie Database (OMDB)**
     This also contains average user ratings from Rotten Tomatoes, imdb and Metacritic**
 *  **Keywords attached to each movie from The Movie DB (TMDB)**
 
@@ -29,9 +32,7 @@ Data drawn from three sources:
 
 The worldwide box office takings for the last 15 years were analysed to give a general trend
 
-Each movie released in the last 15 years was ranked using a combination of gross box office profit and return on investment, giving a way of comparing the performance of movies with different budgets
-
-The best ranked movies were then analysed to find the most profitable genres
+Each movie released in the last 15 years was anlaysed in terms of profit/loss and return on investment to find the best performing genres
 
 Within those genres, the movies were analysed to find which actors, directors and writers were most successful, the runtimes most associated with hits and the budget likely to be needed
 
@@ -39,71 +40,67 @@ Within those genres, the movies were analysed to find which actors, directors an
 <img src="images/reel.jpg" style="width: 700px;"/>
 
 
-### Results
-*  **Box office takings are still down sharply on pre-pandemic levels, with no recovery so far in 2021**
+### Headline Results
+*  **Box office takings per movie are still down sharply on pre-pandemic levels, with small signs of recovery so far in 2021**
 
 <img src="images/worldwide_bo.png" style="width: 700px;"/>
 
-*  **The Thriller genre produced the best box office performing movies with a realistic start-up budget ($20 -30 million)**
-*  **Action/Adventure movies represent a riskier but potentially more profitable option once the studio is established**
+* **Adventure/Action/Sci-Fi movies represent generated the most profit per movie**
 
-<img src="images/genre_rank.png" style="width: 700px;"/>
+<img src="images/profit_v_genre.png" style="width: 700px;"/>
+
+* **The most profitable movies in the genre operated with a budget of $150 to $250 million**
+
+<img src="images/adventure_budget_pl_sub_scatter.png" style="width: 700px;"/>
+
+* **Mark Ruffalo was the best performing actor in the genre, with Joss Whedon and JJ.Abrams among the top performing directors**
+
+<img src="images/ad_Actors_ranks.png" style="width: 700px;"/>
+
+<img src="images/ad_Directors_ranks.png.png" style="width: 700px;"/>
+
+* **Horror/Mystery/Thriller movies genre generated the best return on investment...**
+
+<img src="images/ROI_v_genre.png" style="width: 700px;"/>
+
+* **...on a lower budget...**
+
+<img src="images/horror_budget_pl_sub_scatter.png" style="width: 700px;"/>
+
+* **...and also offered the best chance of making a profit**
+
+<img src="images/flops_v_hits.png" style="width: 700px;"/>
 
 
-
-<img src="images/budget_genre.png" style="width: 700px;"/>
-
-
-*  **Within the Thriller genre, the sub-genres of Horror and Mystery were most associated with hits**
-
-
-
-<img src="images/subgenre_rank.png" style="width: 700px;"/>
-
-<br>
-<br>
-
-*  **Rose Byrne, Patrick Wilson have been the most profitable actors in the Thriller/Mystery/Horror genre**
-
-*  **Jordan Peele and James Wan have been the most profitable directors and writers in the genre**
-
-<br>
-<br>
-
-<br>
-
-<img src="images/actors_ranks.png" style="width: 700px;"/>
-
-<br>
-<br>
-
-<img src="images/directors_ranks.png" style="width: 700px;"/>
-
-<br>
-<br>
-
-*  **The most successful films in the genre have a runtime of around 110 minutes**
-
-<br>
 
 ### Conclusion
 
-This analysis leads to three recommendations for Microsoft Studio to make succesful movies
+This analysis leads to three recommendations for Microsoft Studio to make succesful movies, on the general timing of releases, the type of high budget movies it should make and what type of lower budget movies it should focus on
 
-*  **TIMING -** Wait until the market recovers before releasing movies, with July 2022 and February 2023 potential target dates
+* **General Timing** - The first movies should be released until the world's top 10 markets have fully reopened from lockdown - subject to the pandemic
 
-*  **FEATURES -** Early movies should be in the Thriller genre, with Thriller/Horror/Mysteries offering the best chance of early success 
- They should have a $20 - $30 million budget and a runtime of 94 to 100 minutes. The studio should think about Action/Adventure movies once it has etablished a reputation
- 
-*  **PERSONNEL -** The studio should recruit Rose Byrne and Patrick Wilson in early movies, and Jordan Peele to write and direct
+**High Budget**
+
+* **Genre** - The studio's high budget movies should be in the Adventure/Sci-Fi/Action genre
+* They should have a budget of between 150 and 250 million dollars
+* The studio should target Mark Ruffalo and/or Bryce Dallas Howard as lead actors
+* It should target Joss Whedon as director and writer, or JJ Abrams as director
+* The movies should be over 137 minutes long and be released in April, December, November or June
+
+**Low Budget**
+
+* **Genre** - The studio's low budget movies should be in the Horror/Mystery/Thriller genre
+* They should have a budget of between 20 and 25 million dollars
+* The studio should target Rose Byrne and/or Patrick Wilson as lead actors
+* It should target Jordan Peele as director and writer
+* The movies should be between 96 and 116 minutes long and be released in July, March and February
 
 
 ### Next steps
 
 *  Collect as much information as possible from the top 10 global markets to see if they are recovering from the pandemic
  
-*  Conduct surveys to see which types of film people want to see after the pandemic
+*  Conduct surveys to see which types of movies people want to see after the pandemic
 
-*  Collect data on the view count of movies on streaming services compared with the cinema
+*  Collect data on the view count of movies on streaming services compared with the cinema as theatres reopen around the world
 
-*  So far the value of a movie in the streaming market has generally been linked to its box office performance, data needs to be collected to track whether this trend is changing
