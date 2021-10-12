@@ -205,35 +205,10 @@ def make_omdb_dict(financials_15_df, omdb_key):
 update_dud_url=[]
 update_retrieve_error=[]
 
-# the list of important movies where api call failed due to ambiguous title
-manual_list = ['Star Wars Ep. VII: The Force Awakens', 
-'Star Wars Ep. VIII: The Last Jedi', 
-'Prince of Persia: Sands of Time', 
-'Fast and Furious 6', 
-'The Chronicles of Narnia: The Voyage of the Daw…', 
-'Harry Potter and the Deathly Hallows: Part II', 
-'Harry Potter and the Deathly Hallows: Part I', 
-'Fantastic Four: Rise of the Silver Surfer', 
-'The Hangover 3', 
-'Ford v. Ferrari', 
-'Dr. Seuss’ The Grinch', 
-'Mamma Mia: Here We Go Again!', 
-'The Angry Birds Movie', 
-'Wall Street 2: Money Never Sleeps',
-'Dr. Seuss’ The Lorax', 
-'All Eyez on Me', 
-'John Wick: Chapter Two', 
-'Underworld 3: Rise of the Lycans', 
-'Halloween 2',        
-'Precious (Based on the Novel Push by Sapphire)']
-
-# and their imdb codes, which can be used instead of title to call the OMDB api
-manual_imdb = ['tt2488496', 'tt2527336', 'tt0473075', 'tt1905041', 'tt0980970', 'tt1201607', 'tt0926084', 'tt0486576', 'tt1951261', 'tt1950186', 'tt2709692', 'tt6911608', 'tt1985949', 'tt1027718', 'tt1482459', 'tt1666185', 'tt4425200', 'tt0834001', 'tt1311067', 'tt0929632']
-
-zipped_codes = list(zip(manual_list, manual_imdb))
 
 
-def update_on_success(financials_15_df, movie_data, pair, imdb_code):
+
+def update_on_success(financials_15_df, movie_data, pair, omdb_attrs, imdb_code):
     title = pair[0]
     financials_15_df.loc[financials_15_df['title'] == title, 'imdb_code'] = imdb_code
     keys = ['Actors', 'Director', 'Genre', 'Plot', 'Rated', 'Ratings', 'Runtime', 'Writer', 'Title', 'imdbRating', 'imdbVotes']
@@ -244,7 +219,7 @@ def update_get_page(url):
     movie_data = json.loads(response.content.decode('utf-8')) 
     return movie_data
 
-def update_make_omdb_dict(financials_15_df, omdb_key):
+def update_make_omdb_dict(financials_15_df, omdb_key, omdb_attrs, zipped_codes):
     '''Similar to preceding main api call function, but called afterwards for those movies that failed due to ambiguous title
     using imdb code instead of title. Easier to use totally new functions due to the different way the url is constructed'''
     for pair in zipped_codes:
@@ -252,17 +227,17 @@ def update_make_omdb_dict(financials_15_df, omdb_key):
         url = 'http://www.omdbapi.com/?i=' + imdb_code + '&apikey=' + omdb_key
         try:
             movie_data = update_get_page(url)
-            update_on_success(financials_15_df, movie_data, pair, imdb_code) 
+            update_on_success(financials_15_df, movie_data, pair, omdb_attrs, imdb_code) 
         except:
             update_dud_url.append(pair[0])
 
      # delete any rows in financials_15yr where there is no imdb_code
 
     financials_15_df = financials_15_df[financials_15_df.imdb_code != 'No_code']
-    return financials_15_df            
+    return (omdb_attrs, financials_15_df)          
             
 
-def rating_formatter():
+def rating_formatter(omdb_attrs):
     '''updates attributes dict returned in above functions by exploding the ratings list, so we have a column for each site'''
     for key in omdb_attrs:
         for k in omdb_attrs[key]['Ratings']:
@@ -273,7 +248,7 @@ def rating_formatter():
                 omdb_attrs[key]['MetacriticRating'] = outlet_ratings[1][:-4]
 
 
-def clean_values():
+def clean_values(omdb_attrs):
     '''formats the dictionary for conversion to df '''
     for mov in omdb_attrs:
         actor_list = omdb_attrs[mov]['Actors'].split(',')
@@ -306,10 +281,10 @@ def clean_values():
             omdb_attrs[mov]['imdb_votes'] = '0'
 
 
-def make_attributes_df():
+def make_attributes_df(omdb_attrs):
     '''makes the dataframe of movie metadata from ommdb'''
-    rating_formatter()
-    clean_values()
+    rating_formatter(omdb_attrs)
+    clean_values(omdb_attrs)
     
     # make attributes linking dict 
     to_df_dict = {}
