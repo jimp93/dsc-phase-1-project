@@ -78,7 +78,7 @@ Within those genres, the movies were analysed to find which actors, directors an
 * **Mark Ruffalo was the best performing actor in the genre, with Joss Whedon and JJ.Abrams among the top performing directors**
 <br>
 
-<img src="images/ad_Actors_ranks.png" style="width: 700px;"/>
+<img src="images/ad_scifi_prof_v_actor.png" style="width: 700px;"/>
 
 <br>
 <br>
