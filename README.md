@@ -32,7 +32,7 @@ Data drawn from three sources:
 
 *  **Box office performance of more the 6,000 movies from The Numbers website**
  *  **Genre, crew, and release date of each movie from Open Movie Database (OMDB)**
-    This also contains average user ratings from Rotten Tomatoes, imdb and Metacritic**
+    This also contains average user ratings from Rotten Tomatoes, imdb and Metacritic
 *  **Keywords attached to each movie from The Movie DB (TMDB)**
 
 <br>
@@ -88,7 +88,7 @@ Within those genres, the movies were analysed to find which actors, directors an
 <br>
 <br>
 
-* **Horror/Mystery/Thriller movies genre generated the best return on investment...**
+* **Horror/Mystery/Thriller movies generated the best return on investment...**
 
 <br>
 
@@ -116,7 +116,7 @@ Within those genres, the movies were analysed to find which actors, directors an
 
 ### Conclusion
 
-This analysis leads to three recommendations for Microsoft Studio to make succesful movies, on the general timing of releases, the type of high budget movies it should make and what type of lower budget movies it should focus on
+This analysis leads to three recommendations for Microsoft Studio to make succesful movies; on the general timing of releases, the type of high budget movies it should make and the type of lower budget movies it should focus on
 
 **General Timing** 
 

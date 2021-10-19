@@ -77,7 +77,7 @@ def make_filtered_df(x_column, y_column, base_join_df, genre_filter):
 
 
 def feature_v_financialMean_df_maker(x_column, y_column, base_join_df, genre_filter = None): 
-    '''Main function in data anlysis. It takes in a joined base dataframe, any one of its categorical feature, 
+    '''Main function in data analysis. It takes in a joined base dataframe, any one of its categorical feature, 
     one of its financial columns, and a filter for genres
     It returns a dataframe grouped by the categorical feature and ordered by the mean of the financial column'''
     
